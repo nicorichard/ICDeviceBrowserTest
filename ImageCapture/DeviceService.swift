@@ -4,8 +4,7 @@ import Combine
 
 class DeviceService: NSObject, ObservableObject {
     let browser = ICDeviceBrowser()
-
-    var cancellables = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
 
     override init() {
         super.init()
@@ -51,27 +50,18 @@ class DeviceService: NSObject, ObservableObject {
     func stop() {
         browser.stop()
     }
+
+    var devices: [String] {
+        browser.devices?.map(\.description) ?? []
+    }
 }
 
 extension DeviceService: ICDeviceBrowserDelegate {
     func deviceBrowser(_ browser: ICDeviceBrowser, didAdd device: ICDevice, moreComing: Bool) {
-        print("!@# didAdd \(device) moreComing \(moreComing)")
+        objectWillChange.send()
     }
     
     func deviceBrowser(_ browser: ICDeviceBrowser, didRemove device: ICDevice, moreGoing: Bool) {
-        print("!@# didRemove \(device) moreGoing \(moreGoing)")
+        objectWillChange.send()
     }
-}
-
-import SwiftUI
-
-extension EnvironmentValues {
-    var deviceService: DeviceService {
-        get { self[DeviceServiceKey.self] }
-        set { self[DeviceServiceKey.self] = newValue }
-    }
-}
-
-enum DeviceServiceKey: EnvironmentKey {
-    static var defaultValue: DeviceService = DeviceService()
 }

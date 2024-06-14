@@ -6,31 +6,53 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            deviceService.browser.isBrowsing ? Text("Browsing") : Text("Not browsing")
-            deviceService.browser.isSuspended ? Text("Suspended") : Text("Not suspended")
-
-            Text("auth response: \(deviceService.requestContentsAuthorizationResponse?.rawValue ?? "none")")
-
-            Text("reset response: \(deviceService.resetContentsAuthorizationResponse?.rawValue ?? "none")")
-
-            Text("auth status: \(deviceService.browser.contentsAuthorizationStatus.rawValue)")
-
-            Button("Authorize") {
-                deviceService.requestAuthorization()
+            VStack(alignment: .leading) {
+                Text("Browsing: \(deviceService.browser.isBrowsing)")
+                Text("Suspended: \(deviceService.browser.isSuspended)")
+                Text("Auth status: `\(authStatus)`")
+                Text("")
+                Text("Auth response: `\(authResponse)`")
+                Text("Reset response: `\(resetResponse)`")
+                Text("")
+                Text("Found Devices:")
+                ForEach(deviceService.devices, id: \.self) { device in
+                    Text(device)
+                }
             }
+            .font(.caption)
 
-            Button("Reset") {
-                deviceService.resetAuthorization()
-            }
+            Divider()
 
-            Button("Start") {
-                deviceService.start()
-            }
+            VStack {
+                Button("Authorize") {
+                    deviceService.requestAuthorization()
+                }.buttonStyle(.bordered)
 
-            Button("Stop") {
-                deviceService.stop()
-            }
+                Button("Reset") {
+                    deviceService.resetAuthorization()
+                }.buttonStyle(.bordered)
+
+                Button("Start") {
+                    deviceService.start()
+                }.buttonStyle(.bordered)
+
+                Button("Stop") {
+                    deviceService.stop()
+                }.buttonStyle(.bordered)
+            }.padding()
         }
+    }
+
+    var authStatus: String {
+        deviceService.browser.contentsAuthorizationStatus.rawValue
+    }
+
+    var authResponse: String {
+        deviceService.requestContentsAuthorizationResponse?.rawValue ?? "none"
+    }
+
+    var resetResponse: String {
+        deviceService.resetContentsAuthorizationResponse?.rawValue ?? "none"
     }
 }
 
